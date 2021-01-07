@@ -1,0 +1,11 @@
+*.iml
+.gradle
+.DS_Store
+/.idea/
+/build
+androidApp/build
+shared/build
+out/
+local.properties
+xcuserdata/
+Pods/
