@@ -1,26 +1,28 @@
 package com.step4me.githubbrowser.androidApp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import com.step4me.githubbrowser.shared.GithubClient
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private val mainScope = MainScope()
-    private val apiClient = GithubClient()
+
     // TODO 직접 입력받는 형태로 수정
     private val testKeyword = "step4me"
+    private val androidViewModel: AndroidViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = "Github Browser"
         setContentView(R.layout.activity_main)
-        searchUser(testKeyword)
+        findViewById<Button>(R.id.btn_search).setOnClickListener(this)
     }
 
     override fun onDestroy() {
@@ -28,14 +30,14 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun searchUser(query: String) {
-        mainScope.launch {
-            kotlin.runCatching {
-                apiClient.getUser(query)
-            }.onSuccess {
-                Log.i("user info", "name=${it.name}, blog=${it.blog}")
-            }.onFailure {
-                Toast.makeText(this@MainActivity, it.localizedMessage, Toast.LENGTH_SHORT).show()
+    @ExperimentalCoroutinesApi
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btn_search -> {
+                androidViewModel.searchUser(testKeyword) { user ->
+                    findViewById<TextView>(R.id.tv_username).text = user.name
+                    findViewById<TextView>(R.id.tv_user_blog).text = user.blog
+                }
             }
         }
     }
